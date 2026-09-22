@@ -17,11 +17,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 ROOT = Path(__file__).resolve().parent
 OUTPUT = ROOT / "output"
 REPORT = ROOT.parent / "5023146_SamuelR.pdf"
-NAVY = "#153243"
-CORAL = "#e07a5f"
-GOLD = "#f2cc8f"
-INK = "#24323d"
-MUTED = "#5f6b72"
+NAVY = "black"
+CORAL = "black"
+GOLD = "black"
+INK = "black"
+MUTED = "black"
 
 
 def load_results() -> list[dict]:
@@ -30,30 +30,32 @@ def load_results() -> list[dict]:
 
 def new_page(title: str, subtitle: str | None = None):
     fig = plt.figure(figsize=(8.27, 11.69), facecolor="white")
-    fig.text(0.08, 0.955, "EDGE BIOREEF GUARDIAN  /  EXPERIMENT 11", color=CORAL,
-             fontsize=8, weight="bold")
-    fig.text(0.08, 0.915, title, color=NAVY, fontsize=21, weight="bold")
-    if subtitle:
-        fig.text(0.08, 0.885, subtitle, color=MUTED, fontsize=10)
-    fig.lines.append(plt.Line2D([0.08, 0.92], [0.865, 0.865], color=CORAL, linewidth=1.2))
+    fig.text(0.10, 0.95, title, fontsize=16, weight="bold", color="black")
+    return fig
+
+
+def page(title: str, page_number: int):
+    fig = plt.figure(figsize=(8.27, 11.69), facecolor="white")
+    fig.text(0.10, 0.95, title, fontsize=16, weight="bold", color="black")
+    footer(fig, page_number)
     return fig
 
 
 def footer(fig, page: int):
-    fig.text(0.08, 0.035, "5023146_SamuelR  |  Edge Computing Laboratory", fontsize=7, color=MUTED)
+    fig.text(0.10, 0.035, "Experiment 11 | 5023146 Samuel R | Page {}".format(page), fontsize=8, color="black")
     fig.text(0.92, 0.035, str(page), fontsize=7, color=MUTED, ha="right")
 
 
 def paragraph(fig, x: float, y: float, text: str, width: int = 88, size: float = 10):
     lines = textwrap.wrap(text, width=width)
-    fig.text(x, y, "\n".join(lines), va="top", fontsize=size, color=INK, linespacing=1.35)
+    fig.text(x, y, "\n".join(lines), va="top", fontsize=size, color="black", linespacing=1.35)
     return y - 0.021 * len(lines) - 0.014
 
 
 def bullet_list(fig, x: float, y: float, items: list[str], width: int = 82):
     for item in items:
         lines = textwrap.wrap(item, width=width - 4)
-        fig.text(x, y, "•", fontsize=10, color=CORAL, va="top")
+        fig.text(x, y, "-", fontsize=10, color="black", va="top")
         fig.text(x + 0.018, y, "\n".join(lines), fontsize=9.5, color=INK,
                  va="top", linespacing=1.35)
         y -= 0.027 * len(lines) + 0.012
@@ -66,28 +68,27 @@ def section(fig, x: float, y: float, heading: str, body: str):
 
 
 def cover(pdf: PdfPages, results: list[dict]):
-    fig = plt.figure(figsize=(8.27, 11.69), facecolor=NAVY)
-    fig.text(0.08, 0.84, "EXPERIMENT 11", color=GOLD, fontsize=12, weight="bold")
-    fig.text(0.08, 0.75, "Edge BioReef\nGuardian", color="white", fontsize=35,
-             weight="bold", linespacing=1.05)
-    fig.text(0.08, 0.60, "Latency-aware acoustic evidence fusion for\ncoral reef monitoring",
-             color="#dce8eb", fontsize=15, linespacing=1.45)
-    fig.add_artist(plt.Rectangle((0.08, 0.49), 0.84, 0.004, transform=fig.transFigure, color=CORAL))
-    fig.text(0.08, 0.42, "Submitted by", color="#a9c0c7", fontsize=9)
-    fig.text(0.08, 0.385, "5023146 / Samuel R", color="white", fontsize=18, weight="bold")
+    fig = plt.figure(figsize=(8.27, 11.69), facecolor="white")
+    fig.text(0.5, 0.78, "EXPERIMENT 11", ha="center", fontsize=16, color="black")
+    fig.text(0.5, 0.70, "EDGE BIOREEF GUARDIAN", ha="center", fontsize=24, weight="bold", color="black")
+    fig.text(0.5, 0.64, "Latency-Aware Acoustic Monitoring at the Edge", ha="center", fontsize=13, color="black")
+    fig.text(0.5, 0.49, "Project Report", ha="center", fontsize=15, color="black")
+    fig.add_artist(plt.Rectangle((0.08, 0.49), 0.84, 0.004, transform=fig.transFigure, color="black"))
+    fig.text(0.08, 0.42, "Submitted by", color="black", fontsize=9)
+    fig.text(0.08, 0.385, "5023146 / Samuel R", color="black", fontsize=18, weight="bold")
     fig.text(0.08, 0.29, "A Python simulation of submerged hydrophones,\nedge gateways, evidence reporting, and cloud analysis.",
-             color="#dce8eb", fontsize=11, linespacing=1.5)
+             color="black", fontsize=11, linespacing=1.5)
     total_raw = sum(r["raw_uplink_mb_per_min"] for r in results)
     total_reported = sum(r["reported_uplink_mb_per_min"] for r in results)
     fig.text(0.08, 0.12, f"{len(results)} operating scenarios   |   {total_raw:.2f} MB/min raw stream\n"
                           f"{total_reported:.4f} MB/min reported evidence   |   50–55 ms local alerting",
-             color=GOLD, fontsize=10, linespacing=1.6)
+             color="black", fontsize=10, linespacing=1.6)
     pdf.savefig(fig, bbox_inches="tight")
     plt.close(fig)
 
 
 def overview(pdf: PdfPages):
-    fig = new_page("Aim, objectives, and requirements", "A focused edge-computing experiment for reef acoustics")
+    fig = page("1. Introduction", 2)
     y = 0.82
     y = section(fig, 0.08, y, "Aim", "To implement and evaluate an edge-first acoustic monitoring system that classifies hydrophone frames locally, fuses corroborating detections at nearby gateways, raises rapid reef alerts, and forwards only compact evidence to the cloud.")
     y -= 0.015
@@ -151,7 +152,7 @@ def theory_method(pdf: PdfPages):
 
 
 def results_page(pdf: PdfPages, results: list[dict]):
-    fig = new_page("Results", "One minute of simulated operation per reef scenario")
+    fig = page("3. Results", 4)
     headers = ["Scenario", "Hydrophones", "Raw MB/min", "Evidence MB/min", "Saved", "Edge alert", "Cloud-only", "Recall", "Precision"]
     rows = [[r["name"], r["hydrophones"], f'{r["raw_uplink_mb_per_min"]:.2f}',
              f'{r["reported_uplink_mb_per_min"]:.4f}', f'{r["bandwidth_reduction_percent"]:.3f}%',
@@ -183,21 +184,21 @@ def results_page(pdf: PdfPages, results: list[dict]):
     plt.close(fig)
 
 
-def graph_page(pdf: PdfPages, filename: str, title: str, interpretation: str, page: int):
-    fig = new_page(title, "Generated directly from run_simulation.py")
+def graph_page(pdf: PdfPages, filename: str, title: str, interpretation: str, page_number: int):
+    fig = page(f"4.{page_number - 4} {title}", page_number)
     image = mpimg.imread(OUTPUT / filename)
     ax = fig.add_axes([0.08, 0.34, 0.84, 0.49])
     ax.imshow(image)
     ax.axis("off")
     fig.text(0.08, 0.26, "Interpretation", fontsize=12, weight="bold", color=CORAL)
     paragraph(fig, 0.08, 0.225, interpretation, width=88, size=10)
-    footer(fig, page)
+    footer(fig, page_number)
     pdf.savefig(fig, bbox_inches="tight")
     plt.close(fig)
 
 
 def conclusion(pdf: PdfPages):
-    fig = new_page("Result and conclusion", "Assessment of the Edge BioReef Guardian design")
+    fig = page("8. Conclusion", 8)
     y = 0.82
     y = section(fig, 0.08, y, "Result", "The Edge BioReef Guardian successfully keeps the urgent acoustic monitoring loop local. Across Dawn Chorus, Tourist Boats, Spawning Pulse, and Storm Front, all hydrophone frames are classified at the edge while only tiny evidence reports reach the cloud. The design reduces upstream traffic by approximately 99.997–99.998% and delivers alerts in about 50–55 ms. Cloud-only response is substantially slower, reaching 472.03 ms in the storm scenario.")
     y -= 0.01
